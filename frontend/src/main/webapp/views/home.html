@@ -1,0 +1,33 @@
+
+<page-id id="guestbook-home"/>
+<p>Sign the guestbook</p>
+<p>
+    <label>Firstname</label>:
+    <input id="firstname" data-ng-model="guest.firstname"/>
+</p>
+<p>
+    <label>Lastname</label>:
+    <input id="lastname" data-ng-model="guest.lastname"/>
+</p>
+<input id="signGuestbook" type="button" class="btn btn-primary" data-ng-click="sign()" value="Click Here!"/>
+
+<table>
+    <thead>
+        <tr>
+            <th><span>Name</span></th>
+            <th><span>Signed</span></th>
+        </tr>
+    </thead>
+    <tbody id="guests">
+        <tr data-ng-repeat="signedGuest in signed">
+            <td><div><span data-key="firstname-{{$index}}">{{signedGuest.firstname}}</span>&nbsp;<span data-key="lastname-{{$index}}">{{signedGuest.lastname}}</span></div></td>
+            <td><span data-key="signed-{{$index}}">{{signedGuest.created | date:'yyyy-MM-dd HH:mm'}}</span></td>
+        </tr>
+        <tr>
+            <td><div><span>{{guest.firstname}}</span>&nbsp;<span>{{guest.lastname}}</span></div></td>
+        </tr>
+    </tbody>
+</table>
+
+
+

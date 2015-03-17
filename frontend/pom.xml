@@ -1,0 +1,158 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.hybris</groupId>
+        <artifactId>collaboration-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>collaboration-frontend</artifactId>
+    <packaging>war</packaging>
+    <name>JavaScript-frontend</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+    </dependencies>
+    <properties>
+        <surefire.failsafe.argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</surefire.failsafe.argLine>
+
+        <container.port>7070</container.port>
+        <mysql.port>3306</mysql.port>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <configuration>
+                    <stopKey>secret</stopKey>
+                    <stopPort>8079</stopPort>
+                    <webApp>
+                        <contextPath>/frontend</contextPath>
+                    </webApp>
+                    <contextHandlers>
+                        <contextHandler implementation="org.eclipse.jetty.maven.plugin.JettyWebAppContext">
+                            <war>${project.basedir}/../server/target/collaboration-server-${project.version}.war</war>
+                            <contextPath>/server</contextPath>
+                        </contextHandler>
+                    </contextHandlers>
+                </configuration>
+            </plugin>
+            <!-- Surefire Plugin for Unit Testing -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/*IntegrationTest.java</exclude>
+                    </excludes>
+                    <argLine>${surefire.failsafe.argLine}</argLine>
+                </configuration>
+            </plugin>
+            <!-- Failsafe configuration for Integration Tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <!-- Need to set 'catalina.base' system property as it does not exist
+                        outside of the web container -->
+                    <systemPropertyVariables>
+                        <catalina.base>${project.build.directory}</catalina.base>
+                    </systemPropertyVariables>
+                    <includes>
+                        <include>**/*IntegrationTest.java</include>
+                    </includes>
+                    <argLine>${surefire.failsafe.argLine}</argLine>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>integration-test-failsafe</id>
+                        <inherited>true</inherited>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.jcabi</groupId>
+                                    <artifactId>mysql-dist</artifactId>
+                                    <version>5.6.21</version>
+                                    <classifier>${mysql.classifier}</classifier>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/mysql-dist</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+
+        <profile>
+            <id>LOCAL-DB</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.jcabi</groupId>
+                        <artifactId>jcabi-mysql-maven-plugin</artifactId>
+                        <version>0.8.2</version>
+                        <executions>
+                            <execution>
+                                <id>mysql-start</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>classify</goal>
+                                    <goal>start</goal>
+                                </goals>
+                                <configuration>
+                                    <port>${mysql.port}</port>
+                                    <data>${project.build.directory}/mysql-data</data>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>mysql-stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                                <configuration>
+                                    <port>${mysql.port}</port>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
