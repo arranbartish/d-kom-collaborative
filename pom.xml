@@ -323,13 +323,13 @@
             <repositories>
                 <repository>
                     <id>local-nexus</id>
-                    <url>http://localhost:8080/nexus-2.11.2-06/content/groups/public</url>
+                    <url>http://172.20.25.12:8080/nexus-2.11.2-06/content/groups/public</url>
                 </repository>
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
                     <id>local-nexus</id>
-                    <url>http://localhost:8080/nexus-2.11.2-06/content/groups/public</url>
+                    <url>http://172.20.25.12:8080/nexus-2.11.2-06/content/groups/public</url>
                 </pluginRepository>
             </pluginRepositories>
         </profile>
